@@ -21,7 +21,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class LethargicPerms extends JavaPlugin {
+public final class LethargicPerms extends JavaPlugin {
 
 	//ClassListeners
 	private final LethargicPermsCommandExecutor commandExecutor = new LethargicPermsCommandExecutor(this);
@@ -47,5 +47,9 @@ public class LethargicPerms extends JavaPlugin {
 		WepifProvider wp = new WepifProvider(this);
 		
 		getServer().getServicesManager().register(com.sk89q.wepif.PermissionsProvider.class, wp, this, ServicePriority.High);
+	}
+	
+	public PermissionsManager getManager() {
+	    return eventListener;
 	}
 }

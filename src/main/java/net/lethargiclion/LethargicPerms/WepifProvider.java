@@ -1,5 +1,9 @@
 package net.lethargiclion.LethargicPerms;
 
+import java.util.List;
+
+import net.lethargiclion.LethargicPerms.model.Subject;
+
 import org.bukkit.OfflinePlayer;
 import com.sk89q.wepif.PermissionsProvider;
 
@@ -47,8 +51,7 @@ public class WepifProvider implements PermissionsProvider {
      */
     @Override
     public boolean hasPermission(String playerName, String permission) {
-        // TODO Auto-generated method stub
-        return false;
+        return plugin.getManager().getSubject(playerName).hasNode(permission);
     }
 
     /**
@@ -56,8 +59,7 @@ public class WepifProvider implements PermissionsProvider {
      */
     @Override
     public boolean hasPermission(OfflinePlayer player, String permission) {
-        // TODO Auto-generated method stub
-        return false;
+        return hasPermission(player.getName(), permission);
     }
 
     /**
@@ -65,8 +67,9 @@ public class WepifProvider implements PermissionsProvider {
      */
     @Override
     public boolean hasPermission(String worldName, String playerName, String permission) {
-        // TODO Auto-generated method stub
-        return false;
+        List<String> groups = plugin.getManager().resolveGroups(playerName);
+        Subject testSubject = new Subject(playerName, worldName, groups);
+        return testSubject.hasNode(permission);
     }
 
     /**
@@ -74,8 +77,7 @@ public class WepifProvider implements PermissionsProvider {
      */
     @Override
     public boolean hasPermission(String worldName, OfflinePlayer player, String permission) {
-        // TODO Auto-generated method stub
-        return false;
+        return hasPermission(worldName, player.getName(), permission);
     }
 
     @Override
@@ -83,8 +85,7 @@ public class WepifProvider implements PermissionsProvider {
      * Returns whether the named player is in the named group.
      */
     public boolean inGroup(String playerName, String group) {
-        // TODO Auto-generated method stub
-        return false;
+        return plugin.getManager().resolveGroups(playerName).contains(group);
     }
 
     /**
@@ -92,8 +93,7 @@ public class WepifProvider implements PermissionsProvider {
      */
     @Override
     public boolean inGroup(OfflinePlayer player, String group) {
-        // TODO Auto-generated method stub
-        return false;
+        return inGroup(player.getName(), group);
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class PermissionSet {
     
-    private String id;
+    //private String id;
     
     private List<PermissionSet> supersets;
     

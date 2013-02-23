@@ -17,22 +17,36 @@ package net.lethargiclion.LethargicPerms;
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.bukkit.Bukkit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import net.lethargiclion.LethargicPerms.model.Context;
+import net.lethargiclion.LethargicPerms.model.NodeDiff;
+import net.lethargiclion.LethargicPerms.model.Subject;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.permissions.PermissionAttachment;
 
-public class PermissionsManager implements Listener {
+public final class PermissionsManager implements Listener {
 
 	private LethargicPerms plugin;
+    private List<Context> baseContexts;
+    private Map<String, Subject> subjects;
 
 	public PermissionsManager(LethargicPerms plugin) {
 		this.plugin = plugin;
+		
+		subjects = new TreeMap<String, Subject>();
 	}
 
+	/* EXAMPLE CODE START *
 	// This is just one possible event you can hook.
 	// See http://jd.bukkit.org/apidocs/ for a full event list.
 
@@ -44,8 +58,51 @@ public class PermissionsManager implements Listener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Bukkit.getServer().broadcastMessage("Player " + event.getPlayer().getName() + " placed " + event.getBlock().getType() + " at " + event.getBlock().getLocation());
 	}
+	* EXAMPLE CODE END */
 	
-	public void onContextChange() {
-	    
+	@EventHandler(priority=EventPriority.LOWEST)
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        Player p = event.getPlayer();
+        String world = p.getWorld().getName();
+        Subject s = getSubject(p.getName(), world);
+        if(s.getAttachment() == null) { s.setAttachment(p.addAttachment(plugin)); }
+        if(!s.getContextData().getWorld().equals(world)) {
+            s.setWorld(world);
+            onContextChanged(s);
+        }
+        
+    }
+	
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+	    Subject subject = subjects.get(event.getPlayer().getName());
+	    subject.setWorld(event.getPlayer().getWorld().getName());
+	    onContextChanged(subject);
 	}
+	
+	public void onContextChanged(Subject s) {
+	    NodeDiff diff = s.resolveContexts(baseContexts);
+	    
+	    PermissionAttachment a = s.getAttachment();
+	    for(String node : diff.getNodesToRemove()) a.unsetPermission(node);
+	    for(String node : diff.getNodesToAdd()) a.setPermission(node, true);
+	}
+	
+	public Subject getSubject(String name) {
+	    return getSubject(name, "");
+	}
+
+	private Subject getSubject(String name, String world) {
+	    if(subjects.containsKey(name)) return subjects.get(name);
+	    
+	    Subject s = new Subject(name, world, resolveGroups(name));
+	    s.resolveContexts(baseContexts);
+	    subjects.put(name, s);
+	    return s;
+	}
+
+    public List<String> resolveGroups(String name) {
+        // TODO Auto-generated method stub
+        return new ArrayList<String>();
+    }
 }

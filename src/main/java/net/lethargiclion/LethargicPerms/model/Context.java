@@ -1,10 +1,11 @@
 
 package net.lethargiclion.LethargicPerms.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Pepresents a context within which permissions apply. Players are
+ * <p>Represents a context within which permissions apply. Players are
  * granted permissions by the contexts that currently apply to them.</p>
  * 
  * <p>Contexts occupy a tree model; they have up to one parent and may have
@@ -19,14 +20,46 @@ import java.util.List;
  */
 public abstract class Context {
     
-    private List<String> nodes;
+    private List<String> nodes = new ArrayList<String>();
     
     private String match;
     
-    private List<Context> children;
+    private List<Context> children = new ArrayList<Context>();
     
-    public boolean matches(String test) {
-        return test.equalsIgnoreCase(match);
+    public abstract boolean matches(ContextData test);
+    
+    protected boolean matches(String str) {
+        return match.equalsIgnoreCase(str);
+    }
+
+    /**
+     * @return A list of child contexts.
+     */
+    public List<Context> getChildren() {
+        return children;
+    }
+
+    /**
+     * @param child The child context to add.
+     */
+    public void addChild(Context child) {
+        this.children.add(child);
+    }
+    
+    public void addNodes(List<String> nodes) {
+        this.nodes.addAll(nodes);
+    }
+    
+    public void addNode(String node) {
+        this.nodes.add(node);
+    }
+    
+    public void addNodes(PermissionSet set) {
+        this.nodes.addAll(set.resolve());
+    }
+    
+    public List<String> getNodes() {
+        return this.nodes;
     }
 
 }
