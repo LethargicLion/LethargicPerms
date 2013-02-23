@@ -25,11 +25,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-public class LethargicPermsEventListener implements Listener {
+public class PermissionsManager implements Listener {
 
 	private LethargicPerms plugin;
 
-	public LethargicPermsEventListener(LethargicPerms plugin) {
+	public PermissionsManager(LethargicPerms plugin) {
 		this.plugin = plugin;
 	}
 
@@ -43,5 +43,9 @@ public class LethargicPermsEventListener implements Listener {
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Bukkit.getServer().broadcastMessage("Player " + event.getPlayer().getName() + " placed " + event.getBlock().getType() + " at " + event.getBlock().getLocation());
+	}
+	
+	public void onContextChange() {
+	    
 	}
 }

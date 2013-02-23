@@ -18,13 +18,14 @@ package net.lethargiclion.LethargicPerms;
  */
 
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LethargicPerms extends JavaPlugin {
 
 	//ClassListeners
 	private final LethargicPermsCommandExecutor commandExecutor = new LethargicPermsCommandExecutor(this);
-	private final LethargicPermsEventListener eventListener = new LethargicPermsEventListener(this);
+	private final PermissionsManager eventListener = new PermissionsManager(this);
 	//ClassListeners
 
 	public void onDisable() {
@@ -42,5 +43,9 @@ public class LethargicPerms extends JavaPlugin {
 		pm.registerEvents(eventListener, this);
 
 		// do any other initialisation you need here...
+		
+		WepifProvider wp = new WepifProvider(this);
+		
+		getServer().getServicesManager().register(com.sk89q.wepif.PermissionsProvider.class, wp, this, ServicePriority.High);
 	}
 }
